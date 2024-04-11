@@ -1,4 +1,4 @@
-package com.demo.springpairprogramming;
+package com.demo.springpairprogramming.service;
 
 import com.demo.springpairprogramming.model.Car;
 import com.demo.springpairprogramming.model.CarPurchasedEvent;
@@ -7,18 +7,16 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.Month;
 import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static java.util.stream.Collectors.groupingBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
-public class CarsSoldReportTest {
+public class SalesSummarizerTest {
 
-    private CarRepository mockRepository = new CarRepository() {
+    private final CarRepository mockRepository = new CarRepository() {
 
         private final Map<Integer, Car> cars = new HashMap<>();
         {
@@ -52,24 +50,15 @@ public class CarsSoldReportTest {
             new CarPurchasedEvent(ZonedDateTime.parse("2024-02-05T14:00:00Z"), 120, 2)
         );
 
-        //When data is summarized
-        List<MonthlyBrandPurchaseSummary> summary = carEvents.stream()
-            .collect(
-                groupingBy(event -> new GroupingKey(mockRepository.findOne(event.carId()).get().getBrand(), event.date().getMonth()),
-                TreeMap::new,
-                Collectors.summingInt(CarPurchasedEvent::purchasePrice)))
-            .entrySet().stream()
-            .map(entry -> new MonthlyBrandPurchaseSummary(
-                entry.getKey().brand(),
-                entry.getKey().month(),
-                entry.getValue()))
-            .toList();
+        //When the data is summarized
+        List<MonthlyCarSaleByBrandRow> summary = new SalesSummarizer(mockRepository)
+                .calcSalesByMonthAndBrand(carEvents);
 
-        String stringSummary = summary.stream()
-            .map(MonthlyBrandPurchaseSummary::toString)
-            .collect(Collectors.joining("\n"));
 
         //Then return a sum of cars sold by amount grouping by month brand
+        String stringSummary = summary.stream()
+            .map(MonthlyCarSaleByBrandRow::toString)
+            .collect(Collectors.joining("\n"));
         assertEquals("""
             Brand: B, Month: FEBRUARY, Monthly total: 120
             Brand: A, Month: MARCH, Monthly total: 240
@@ -80,22 +69,3 @@ public class CarsSoldReportTest {
     }
 }
 
-record GroupingKey(String brand, Month month) implements Comparable<GroupingKey>{
-
-    @Override
-    public int compareTo(GroupingKey other) {
-        int monthComparison = month().compareTo(other.month());
-        if (monthComparison != 0) {
-            return monthComparison;
-        }
-        return brand().compareTo(other.brand());
-    }
-
-}
-
-record MonthlyBrandPurchaseSummary(String brand, Month month, int totalPurchase) {
-    @Override
-    public String toString() {
-        return "Brand: " + brand + ", Month: " + month + ", Monthly total: " + totalPurchase;
-    }
-}
