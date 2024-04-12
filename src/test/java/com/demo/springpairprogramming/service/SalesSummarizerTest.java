@@ -58,12 +58,13 @@ public class SalesSummarizerTest {
         //Then return a sum of cars sold by amount grouping by month brand
         String stringSummary = summary.stream()
             .map(MonthlyCarSaleByBrandRow::toString)
-            .collect(Collectors.joining("\n"));
+            .collect(Collectors.joining("\n", "Brand, Month, Total Cars Sold\n", ""));
         assertEquals("""
-            Brand: B, Month: FEBRUARY, Monthly total: 120
-            Brand: A, Month: MARCH, Monthly total: 240
-            Brand: A, Month: APRIL, Monthly total: 100
-            Brand: B, Month: APRIL, Monthly total: 120""",
+            Brand, Month, Total Cars Sold
+            B, FEBRUARY, 120
+            A, MARCH, 240
+            A, APRIL, 100
+            B, APRIL, 120""",
             stringSummary);
 
     }

@@ -1,6 +1,7 @@
 package com.demo.springpairprogramming.repository;
 
 import com.demo.springpairprogramming.model.Car;
+import org.springframework.data.repository.ListCrudRepository;
 
 import java.util.Optional;
 
