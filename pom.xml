@@ -11,8 +11,13 @@
     <groupId>com.demo</groupId>
     <artifactId>spring-pair-programming</artifactId>
     <version>0.0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
     <name>spring-pair-programming</name>
     <description>spring-pair-programming</description>
+    <modules>
+        <module>app</module>
+        <module>car-sales-spring-starter</module>
+    </modules>
     <properties>
         <java.version>17</java.version>
         <spring-shell.version>3.2.3</spring-shell.version>

@@ -1,5 +1,0 @@
-spring:
-    application:
-        name: spring-pair-programming
-    h2:
-        console.enabled: true
